@@ -12,7 +12,7 @@ namespace Simulated_Internet_Example
 {
     public class NetworkAppExample:NetworkMember
     {
-        public enum NetworkType { Live = 22222, Simulated = 1337 };
+        public enum NetworkType { Live = 22222, Simulated = 1337 }; // port target can be set by value
         public enum NetworkState { Listening, Hibernating}
 
         public NetworkType Network = NetworkType.Simulated;
@@ -30,6 +30,10 @@ namespace Simulated_Internet_Example
             Network = NetType;
         }
 
+        /// <summary>
+        /// Sets the connected member. This may need to be changed to a list of members in your code.
+        /// </summary>
+        /// <param name="IP"></param>
         public void SetDestinationIP(string IP)
         {
             IpConnection = IP;
@@ -44,6 +48,9 @@ namespace Simulated_Internet_Example
             th.Start();
         }
 
+        /// <summary>
+        /// This is an example of a network applications main thread. Put all network opperations in here
+        /// </summary>
         private void NetworkBrain()
         {
             int count = 0;
@@ -56,11 +63,22 @@ namespace Simulated_Internet_Example
             }
         }
 
+        /// <summary>
+        /// This class Recieves all the incoming data whether from the live or simulated internet
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="SourceIP"></param>
         public override void DataListener(byte[] data, string SourceIP)
         {
             Console.WriteLine(SourceIP + " Sent: " + Encoding.UTF8.GetString(data));
         }
 
+        /// <summary>
+        /// This allows messages to be automatically routed to either the simulated internet or the live internet
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="DestinationIP"></param>
+        /// <param name="Self"></param>
         public void SendData(byte[] data, string DestinationIP, NetworkMember Self)
         {
             if (Network == NetworkType.Simulated)
@@ -77,6 +95,11 @@ namespace Simulated_Internet_Example
             }
         }
 
+        /// <summary>
+        /// Sends to the live internet
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="ip"></param>
         private void InternetSend(byte[] data, string ip)
         {
             IPEndPoint EndPoint = new IPEndPoint(IPAddress.Parse(ip), (int)Network);
@@ -84,6 +107,9 @@ namespace Simulated_Internet_Example
             sendSocket.SendTo(data, EndPoint);
         }
 
+        /// <summary>
+        /// Starts the network listening and handles recieve code for the live network.
+        /// </summary>
         private void StartListener()
         {
             State = NetworkState.Listening;

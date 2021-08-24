@@ -47,31 +47,45 @@ namespace Simulated_Internet_Example
         public void SimulationSetUp()
         {
             #region SETUP FOR SIMULATION
-
-            ///////////////////////////////////////////////////////////////////////////////////
-            ///    THIS WILL AUTOMATICALLY BE DONE FOR THE CLIENTS IF THE HOST IP IS SET    ///
-            ///////////////////////////////////////////////////////////////////////////////////
             
             InternetManager manager = new InternetManager();
 
             examples.Add(new NetworkAppExample(manager, NetworkAppExample.NetworkType.Simulated));
             examples.Add(new NetworkAppExample(manager, NetworkAppExample.NetworkType.Simulated));
 
-            examples.First().SimulationID = "one";
-            examples.Last().SimulationID = "two";
+            // each app in your simulated network needs a unique id
 
+            examples.First().SimulationID = "one"; // because there are two members we can use .First() and .Last() to tell them apart
+            examples.Last().SimulationID = "two";  // if we have many members use a for loop and set SimulationID = x.toString(); as x++ increases the value
+
+            // Many of theses steps will be automatically done by the simulated internet if the host is set up
+            // In this example I will be doing everything manually
             manager.Details = new List<ConnectionDetail>();
             manager.Identities = new List<DetailPackage>();
 
+            // RegisterIP(); creates a fake ip. You can tell its fake because it uses 256-999 range for numbers
+            // Example of real IP: 127.0.0.1, 255.255.255.255, etc.  
+            // Example of fake IP: 848.453.944.762 
             string IpOne = manager.RegisterIP();
             string IpTwo = manager.RegisterIP();
+
+            ///////////////////////////////////////////////////////////////////////////////////
+            ///    THIS WILL AUTOMATICALLY BE DONE FOR THE CLIENTS IF THE HOST IP IS SET    ///
+            ///////////////////////////////////////////////////////////////////////////////////
+            
+
+            // here we are adding the member app and the ip address associated.
+            // we also add a location so that ping can be calulated by way of distance
+            // this allows us to place a member on a map and have the ping be relativily consistant amongst many different members
+            // this also prevents impossible ping relations from existing in your simulation
+            // regions of low and high ping should naturally emerge 
 
             manager.Identities.Add(new DetailPackage
             {
                 IP = IpOne,
                 Member = examples.First(),
-                locationX = 0,
-                locationY = 0
+                locationX = 0, // map locationX
+                locationY = 0  // map locationY
             });
 
             manager.Identities.Add(new DetailPackage
@@ -82,6 +96,8 @@ namespace Simulated_Internet_Example
                 locationY = 50
             });
 
+            // ConnectionDetail is used to calculate the relationship between two connected members for proper simulation
+            // it is also used to route messages in the simulated internet
             manager.Details.Add(new ConnectionDetail
             {
                 Member = examples.First(),
@@ -91,10 +107,11 @@ namespace Simulated_Internet_Example
                 Ping = manager.FakePing(manager.Identities.First(), manager.Identities.Last())
             });
 
-            ConnectionDetail d = manager.LookUpConnection(IpOne, IpTwo);
-
+            // you may need to change .SetDestinationIP(string); to be a list of connected members depending on your network application
             examples.First().SetDestinationIP(IpTwo);
             examples.Last().SetDestinationIP(IpOne);
+
+            // start up the engine of the simulated internet
 
             manager.StartNetworkSimulation();            
            
