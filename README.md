@@ -1,3 +1,3 @@
 # Simulated Internet Example
 
-Implementation of this library: https://github.com/BrandonHilde/Simulated-Internet
+This is an implementation of the Simulated Internet library: https://github.com/BrandonHilde/Simulated-Internet
