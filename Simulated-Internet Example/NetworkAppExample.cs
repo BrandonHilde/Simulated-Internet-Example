@@ -70,6 +70,7 @@ namespace Simulated_Internet_Example
         /// <param name="SourceIP"></param>
         public override void DataListener(byte[] data, string SourceIP)
         {
+            // using Console.WriteLine(); in a multi-threaded application is not advisiable but its fine in this example
             Console.WriteLine(SourceIP + " Sent: " + Encoding.UTF8.GetString(data));
         }
 
